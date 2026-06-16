@@ -2,6 +2,7 @@
 // ตัวติดตั้งระบบบันทึกการเข้างานฝึกงาน (OVEC)
 // ลบไฟล์นี้ทิ้งหลังติดตั้งเสร็จเพื่อความปลอดภัย
 
+date_default_timezone_set('Asia/Bangkok');
 require_once __DIR__ . '/includes/logo.php';
 
 $configPath = __DIR__ . '/config/db.php';
@@ -105,6 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             . "            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,\n"
             . "        ]\n"
             . "    );\n"
+            . "    \$pdo->exec(\"SET time_zone = '+07:00'\");\n"
             . "} catch (PDOException \$e) {\n"
             . "    die('Database connection failed: ' . \$e->getMessage());\n"
             . "}\n";

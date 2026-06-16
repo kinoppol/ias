@@ -14,6 +14,7 @@ try {
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         ]
     );
+    $pdo->exec("SET time_zone = '+07:00'");
 } catch (PDOException $e) {
     die('Database connection failed: ' . $e->getMessage());
 }
