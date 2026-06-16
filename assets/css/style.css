@@ -153,7 +153,7 @@ table.data-table td.center { text-align:center; }
 .wp-form-address { font-size:12.5px; color:#94A3B8; margin-bottom:16px; }
 .wp-form-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; margin-bottom:14px; }
 .wp-form-grid label { display:block; font-size:12.5px; font-weight:600; color:#374151; margin-bottom:5px; }
-.wp-form-grid input { width:100%; padding:9px 12px; border:2px solid #E5E7EB; border-radius:9px; font-size:15px; color:#111827; outline:none; }
+.wp-form-grid input, .wp-form-grid select { width:100%; padding:9px 12px; border:2px solid #E5E7EB; border-radius:9px; font-size:15px; color:#111827; outline:none; background:white; }
 .wp-rule-note { background:#FEF3C7; border-radius:10px; padding:11px 14px; font-size:12.5px; color:#92400E; line-height:1.6; }
 
 /* ===== Reports ===== */
