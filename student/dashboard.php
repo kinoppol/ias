@@ -19,16 +19,25 @@ $stmt->execute(['early_checkin_minutes']);
 $earlyRow = $stmt->fetch();
 $earlyMinutes = $earlyRow ? (int)$earlyRow['v'] : 60;
 
-$canCheckIn = $canCheckOut = $isTooEarly = $isWorkDone = false;
+$canCheckIn = $canCheckOut = $isTooEarly = $isWorkDone = $isTooEarlyCheckOut = false;
 $earlyMsg = '';
+$checkOutWaitMsg = '';
 if ($wp) {
     $sched = new DateTime($today . ' ' . $wp['start_time']);
     $early = clone $sched;
     $early->modify("-$earlyMinutes minutes");
+    $endSched = new DateTime($today . ' ' . $wp['end_time']);
+
     if ($todayAtt && $todayAtt['check_out_time']) {
         $isWorkDone = true;
     } elseif ($todayAtt && $todayAtt['check_in_time']) {
-        $canCheckOut = true;
+        if ($now >= $endSched) {
+            $canCheckOut = true;
+        } else {
+            $isTooEarlyCheckOut = true;
+            $diff = round(($endSched->getTimestamp() - $now->getTimestamp()) / 60);
+            $checkOutWaitMsg = "สามารถลงชื่อออกได้ตั้งแต่เวลาเลิกงาน (" . substr($wp['end_time'], 0, 5) . " น.) — อีก $diff นาที";
+        }
     } elseif ($now < $early) {
         $isTooEarly = true;
         $diff = round(($early->getTimestamp() - $now->getTimestamp()) / 60);
@@ -91,6 +100,9 @@ require_once __DIR__ . '/../includes/header.php';
       <?php endif; ?>
       <?php if ($canCheckIn): ?>
         <button class="btn-checkin" onclick="doCheckIn(this)">📍 เช็คอิน (Check-In)</button>
+      <?php endif; ?>
+      <?php if ($isTooEarlyCheckOut): ?>
+        <div class="checkin-early">⏱ <?= htmlspecialchars($checkOutWaitMsg) ?></div>
       <?php endif; ?>
       <?php if ($canCheckOut): ?>
         <button class="btn-checkout" onclick="doCheckOut(this)">📍 เช็คเอาท์ (Check-Out)</button>

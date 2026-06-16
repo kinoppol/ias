@@ -19,11 +19,11 @@ require_once __DIR__ . '/../includes/header.php';
     <div style="text-align:center;">ออกงาน</div>
     <div style="text-align:center;">สถานะ</div>
   </div>
-  <?php foreach ($rows as $r): $si = status_info($r['status']); ?>
+  <?php foreach ($rows as $r): $si = status_info($r['status']); $noCheckout = $r['check_in_time'] && !$r['check_out_time']; ?>
     <div class="history-grid-row">
       <div style="color:#374151;font-weight:500;"><?= htmlspecialchars(fmt_date_th($r['date'])) ?></div>
       <div style="text-align:center;color:#0D47A1;font-weight:700;"><?= fmt_time($r['check_in_time']) ?></div>
-      <div style="text-align:center;color:#374151;"><?= fmt_time($r['check_out_time']) ?></div>
+      <div style="text-align:center;color:<?= $noCheckout ? '#DC2626' : '#374151' ?>;font-weight:<?= $noCheckout ? '600' : '400' ?>;"><?= $noCheckout ? '⚠️ ไม่ได้ลงชื่อออก' : fmt_time($r['check_out_time']) ?></div>
       <div style="text-align:center;"><span class="badge" style="color:<?= $si['color'] ?>;background:<?= $si['bg'] ?>;"><?= htmlspecialchars($si['label']) ?></span></div>
     </div>
   <?php endforeach; ?>

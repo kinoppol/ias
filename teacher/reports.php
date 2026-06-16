@@ -19,6 +19,7 @@ $rptMonth = $_GET['month'] ?? date('Y-m');
 $students = $pdo->query("SELECT * FROM users WHERE role = 'student' ORDER BY id")->fetchAll();
 
 $rows = [];
+$hasC5 = false;
 if ($period === 'daily') {
     $stmt = $pdo->prepare('SELECT * FROM attendance WHERE date = ?');
     $stmt->execute([$rptDate]);
@@ -27,16 +28,21 @@ if ($period === 'daily') {
     foreach ($students as $s) {
         $att = $attMap[$s['id']] ?? null;
         $si = status_info($att['status'] ?? 'absent');
+        $noCheckout = $att && $att['check_in_time'] && !$att['check_out_time'];
         $rows[] = [
             'id' => $s['id'], 'name' => $s['name'], 'dept' => $s['dept'] ?: '-',
             'v1' => $att && $att['check_in_time'] ? fmt_time($att['check_in_time']) : '-',
             'v2' => $att && $att['check_out_time'] ? fmt_time($att['check_out_time']) : '-',
-            'v3' => $si['label'], 'v4' => '-', 'sc' => $si['color'], 'sb' => $si['bg'], 'pc' => '#94A3B8',
+            'v3' => $si['label'],
+            'v4' => $noCheckout ? '⚠️ ไม่ได้ลงชื่อออก' : '-',
+            'v4Color' => $noCheckout ? '#DC2626' : '#94A3B8',
+            'sc' => $si['color'], 'sb' => $si['bg'], 'pc' => '#94A3B8',
         ];
     }
     $title = 'รายงานวันที่ ' . $rptDate;
     $c1 = 'เข้างาน'; $c2 = 'ออกงาน'; $c3 = 'สถานะ'; $c4 = 'หมายเหตุ';
 } else {
+    $hasC5 = true;
     if ($period === 'weekly') {
         $start = $rptWeek;
         $end = (new DateTime($rptWeek))->modify('+4 days')->format('Y-m-d');
@@ -52,6 +58,10 @@ if ($period === 'daily') {
     foreach ($stmt->fetchAll() as $r) {
         $byStudent[$r['student_id']][$r['status']] = (int)$r['c'];
     }
+    $stmt = $pdo->prepare('SELECT student_id, COUNT(*) c FROM attendance WHERE date BETWEEN ? AND ? AND check_in_time IS NOT NULL AND check_out_time IS NULL GROUP BY student_id');
+    $stmt->execute([$start, $end]);
+    $noCheckoutByStudent = [];
+    foreach ($stmt->fetchAll() as $r) $noCheckoutByStudent[$r['student_id']] = (int)$r['c'];
     foreach ($students as $s) {
         $c = $byStudent[$s['id']] ?? [];
         $present = $c['present'] ?? 0;
@@ -60,13 +70,15 @@ if ($period === 'daily') {
         $total = $present + $late + $half;
         $pct = $total ? round(($present + $late) / $total * 100) : 0;
         $pc = $pct >= 90 ? '#16A34A' : ($pct >= 75 ? '#D97706' : '#DC2626');
+        $noCheckout = $noCheckoutByStudent[$s['id']] ?? 0;
         $rows[] = [
             'id' => $s['id'], 'name' => $s['name'], 'dept' => $s['dept'] ?: '-',
             'v1' => (string)$present, 'v2' => (string)$late, 'v3' => (string)$half, 'v4' => $pct . '%',
+            'v5' => (string)$noCheckout, 'v5Color' => $noCheckout > 0 ? '#DC2626' : '#94A3B8',
             'sc' => '#64748B', 'sb' => '#F1F5F9', 'pc' => $pc,
         ];
     }
-    $c1 = 'มาตรงเวลา (วัน)'; $c2 = 'มาสาย (วัน)'; $c3 = 'ขาดงาน (วัน)'; $c4 = 'เปอร์เซ็นต์';
+    $c1 = 'มาตรงเวลา (วัน)'; $c2 = 'มาสาย (วัน)'; $c3 = 'ขาดงาน (วัน)'; $c4 = 'เปอร์เซ็นต์'; $c5 = 'ไม่ลงชื่อออก (วัน)';
 }
 
 $activeSection = 'reports';
@@ -103,7 +115,7 @@ require_once __DIR__ . '/../includes/header.php';
   <div class="table-scroll">
     <table class="data-table" style="min-width:500px;">
       <thead><tr>
-        <th>รหัส</th><th>ชื่อ-สกุล</th><th class="center"><?= htmlspecialchars($c1) ?></th><th class="center"><?= htmlspecialchars($c2) ?></th><th class="center"><?= htmlspecialchars($c3) ?></th><th class="center"><?= htmlspecialchars($c4) ?></th>
+        <th>รหัส</th><th>ชื่อ-สกุล</th><th class="center"><?= htmlspecialchars($c1) ?></th><th class="center"><?= htmlspecialchars($c2) ?></th><th class="center"><?= htmlspecialchars($c3) ?></th><th class="center"><?= htmlspecialchars($c4) ?></th><?php if ($hasC5): ?><th class="center"><?= htmlspecialchars($c5) ?></th><?php endif; ?>
       </tr></thead>
       <tbody>
         <?php foreach ($rows as $r): ?>
@@ -112,8 +124,14 @@ require_once __DIR__ . '/../includes/header.php';
           <td><div style="font-weight:600;color:#1E293B;"><?= htmlspecialchars($r['name']) ?></div><div style="font-size:11px;color:#94A3B8;"><?= htmlspecialchars($r['dept']) ?></div></td>
           <td class="center" style="font-weight:600;color:#0D47A1;"><?= htmlspecialchars($r['v1']) ?></td>
           <td class="center" style="color:#374151;"><?= htmlspecialchars($r['v2']) ?></td>
+          <?php if ($hasC5): ?>
           <td class="center"><span class="badge" style="color:<?= $r['sc'] ?>;background:<?= $r['sb'] ?>;"><?= htmlspecialchars($r['v3']) ?></span></td>
           <td class="center" style="font-weight:600;color:<?= $r['pc'] ?>;"><?= htmlspecialchars($r['v4']) ?></td>
+          <td class="center" style="font-weight:600;color:<?= $r['v5Color'] ?>;"><?= htmlspecialchars($r['v5']) ?></td>
+          <?php else: ?>
+          <td class="center"><span class="badge" style="color:<?= $r['sc'] ?>;background:<?= $r['sb'] ?>;"><?= htmlspecialchars($r['v3']) ?></span></td>
+          <td class="center" style="font-weight:600;color:<?= $r['v4Color'] ?>;"><?= htmlspecialchars($r['v4']) ?></td>
+          <?php endif; ?>
         </tr>
         <?php endforeach; ?>
       </tbody>
