@@ -71,23 +71,6 @@ INSERT INTO settings (k, v) VALUES
   ('late_grace_minutes', '30'),
   ('institution_name', 'สำนักงานคณะกรรมการการอาชีวศึกษา (OVEC)');
 
--- Seed data
-INSERT INTO workplaces (id, name, address, lat, lng, radius, start_time, end_time, teacher_id, allow_ot, active) VALUES
-  ('WP001', 'บริษัท ไทยอิเล็กทรอนิกส์ จำกัด', '123 ถ.สุขุมวิท กรุงเทพฯ', 13.7563000, 100.5018000, 200, '08:00:00', '17:00:00', NULL, 1, 1),
-  ('WP002', 'บริษัท เทคโนโลยีก้าวหน้า จำกัด', '456 ถ.พหลโยธิน กรุงเทพฯ', 13.8000000, 100.5500000, 150, '08:30:00', '17:30:00', NULL, 0, 1);
-
+-- Initial admin account (no demo student/teacher accounts)
 INSERT INTO users (id, name, role, password, grade, dept, workplace_id) VALUES
-  ('STD001', 'นายกฤษณะ มีสุข', 'student', '1234', 'ปวส.2', 'ช่างไฟฟ้า', 'WP001'),
-  ('STD002', 'นางสาวสุภาพร ใจดี', 'student', '1234', 'ปวส.2', 'การบัญชี', 'WP001'),
-  ('STD003', 'นายวิชัย ฉลาดเลิศ', 'student', '1234', 'ปวส.1', 'คอมพิวเตอร์', 'WP002'),
-  ('STD004', 'นางสาวมาลี สวยงาม', 'student', '1234', 'ปวส.1', 'การตลาด', 'WP001'),
-  ('STD005', 'นายพิชิต เก่งมาก', 'student', '1234', 'ปวส.2', 'ช่างยนต์', 'WP002'),
-  ('TEACHER01', 'อ.สมศักดิ์ วิทยาการ', 'teacher', '1234', NULL, 'ฝ่ายแนะแนว', NULL),
-  ('ADMIN', 'ผู้ดูแลระบบ', 'admin', '1234', NULL, NULL, NULL);
-
-UPDATE workplaces SET teacher_id = 'TEACHER01' WHERE id IN ('WP001','WP002');
-
-INSERT INTO leaves (id, student_id, date, type, reason, status, approved_by) VALUES
-  ('LV001', 'STD001', DATE_SUB(CURDATE(), INTERVAL 2 DAY), 'sick', 'ไม่สบาย มีไข้', 'approved', 'TEACHER01'),
-  ('LV002', 'STD002', DATE_SUB(CURDATE(), INTERVAL 4 DAY), 'personal', 'ธุระด่วน', 'pending', NULL),
-  ('LV003', 'STD003', DATE_SUB(CURDATE(), INTERVAL 1 DAY), 'sick', 'ปวดหัว', 'pending', NULL);
+  ('ADMIN', 'ผู้ดูแลระบบ', 'admin', 'password', NULL, NULL, NULL);

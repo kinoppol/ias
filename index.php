@@ -47,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <form method="post">
         <div class="form-group">
           <label>รหัสผู้ใช้งาน / User ID</label>
-          <input type="text" name="loginId" placeholder="STD001 / TEACHER01 / ADMIN" autocomplete="username" required>
+          <input type="text" name="loginId" placeholder="รหัสผู้ใช้งาน" autocomplete="username" required>
         </div>
         <div class="form-group">
           <label>รหัสผ่าน / Password</label>
@@ -60,13 +60,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <button type="submit" class="btn-login">เข้าสู่ระบบ / Login</button>
       </form>
-
-      <div class="demo-accounts">
-        <div class="demo-title">🔑 บัญชีทดสอบ / Demo Accounts</div>
-        <div class="demo-row"><span class="demo-tag demo-tag-blue">STD001</span><span class="demo-pass">รหัสผ่าน: 1234</span><span class="demo-role">👨‍🎓 นักศึกษาฝึกงาน</span></div>
-        <div class="demo-row"><span class="demo-tag demo-tag-green">TEACHER01</span><span class="demo-pass">รหัสผ่าน: 1234</span><span class="demo-role">👩‍🏫 ครูนิเทศ</span></div>
-        <div class="demo-row"><span class="demo-tag demo-tag-amber">ADMIN</span><span class="demo-pass">รหัสผ่าน: 1234</span><span class="demo-role">⚙️ ผู้ดูแลระบบ</span></div>
-      </div>
     </div>
   </div>
 </body>
