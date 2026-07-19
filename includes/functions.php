@@ -54,11 +54,61 @@ function fmt_date_th($dateStr) {
 }
 
 function role_label($role) {
-    return ['student' => 'นักศึกษาฝึกงาน', 'teacher' => 'ครูนิเทศ', 'admin' => 'ผู้ดูแลระบบ'][$role] ?? $role;
+    return ['student' => 'นักศึกษาฝึกงาน', 'teacher' => 'ครูนิเทศ', 'admin' => 'ผู้ดูแลระบบ', 'trainer' => 'ครูฝึก'][$role] ?? $role;
 }
 
 function role_avatar($role) {
-    return ['student' => '👨‍🎓', 'teacher' => '👩‍🏫', 'admin' => '⚙️'][$role] ?? '👤';
+    return ['student' => '👨‍🎓', 'teacher' => '👩‍🏫', 'admin' => '⚙️', 'trainer' => '🧑‍💼'][$role] ?? '👤';
+}
+
+function task_status_info($status) {
+    return [
+        'active'     => ['label' => 'กำลังดำเนินการ', 'color' => '#1565C0', 'bg' => '#DBEAFE', 'icon' => '🔵'],
+        'completed'  => ['label' => 'เสร็จสิ้น',       'color' => '#16A34A', 'bg' => '#DCFCE7', 'icon' => '✅'],
+        'terminated' => ['label' => 'สิ้นสุด (ไม่เสร็จ)', 'color' => '#DC2626', 'bg' => '#FEE2E2', 'icon' => '🔴'],
+    ][$status] ?? ['label' => $status, 'color' => '#64748B', 'bg' => '#F1F5F9', 'icon' => '⏱'];
+}
+
+function save_attachments_to_db($pdo, $taskId = null, $threadId = null, $files = [], $links = []) {
+    $table = $threadId ? 'task_thread_attachments' : 'task_attachments';
+    $col   = $threadId ? 'thread_id' : 'task_id';
+    $refId = $threadId ?? $taskId;
+
+    $allowed = ['jpg','jpeg','png','gif','webp','pdf','doc','docx','xls','xlsx','zip','txt','mp4','mov'];
+    $uploadDir = __DIR__ . '/../uploads/tasks/' . ($taskId ?? 0) . '/';
+    if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+
+    foreach ($files as $file) {
+        if (!isset($file['tmp_name']) || $file['error'] !== UPLOAD_ERR_OK) continue;
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        if (!in_array($ext, $allowed)) continue;
+        $stored = uniqid('f_', true) . '.' . $ext;
+        if (!move_uploaded_file($file['tmp_name'], $uploadDir . $stored)) continue;
+        $stmt = $pdo->prepare("INSERT INTO $table ($col, att_type, original_name, stored_name, mime_type, file_size) VALUES (?, 'file', ?, ?, ?, ?)");
+        $stmt->execute([$refId, $file['name'], $stored, $file['type'], $file['size']]);
+    }
+    foreach ($links as $url) {
+        $url = trim($url);
+        if (!$url) continue;
+        $stmt = $pdo->prepare("INSERT INTO $table ($col, att_type, link_url) VALUES (?, 'link', ?)");
+        $stmt->execute([$refId, $url]);
+    }
+}
+
+function get_task_attachments($pdo, $taskId) {
+    return $pdo->prepare('SELECT * FROM task_attachments WHERE task_id = ? ORDER BY id')
+               ->execute([$taskId]) ? $pdo->query("SELECT * FROM task_attachments WHERE task_id = $taskId ORDER BY id")->fetchAll() : [];
+}
+
+function attachment_icon($mime, $attType) {
+    if ($attType === 'link') return '🔗';
+    if (strpos($mime, 'image') === 0) return '🖼';
+    if ($mime === 'application/pdf') return '📄';
+    if (strpos($mime, 'word') !== false || strpos($mime, 'document') !== false) return '📝';
+    if (strpos($mime, 'excel') !== false || strpos($mime, 'sheet') !== false) return '📊';
+    if (strpos($mime, 'zip') !== false) return '🗜';
+    if (strpos($mime, 'video') === 0) return '🎬';
+    return '📎';
 }
 
 function leave_type_label($type) {

@@ -20,7 +20,7 @@ CREATE TABLE workplaces (
 CREATE TABLE users (
   id VARCHAR(20) PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
-  role ENUM('student','teacher','admin') NOT NULL,
+  role ENUM('student','teacher','admin','trainer') NOT NULL,
   password VARCHAR(255) NOT NULL,
   grade VARCHAR(50) NULL,
   dept VARCHAR(100) NULL,
@@ -78,6 +78,58 @@ INSERT INTO settings (k, v) VALUES
   ('early_checkin_minutes', '60'),
   ('late_grace_minutes', '30'),
   ('institution_name', 'สำนักงานคณะกรรมการการอาชีวศึกษา (OVEC)');
+
+CREATE TABLE tasks (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(500) NOT NULL,
+  description TEXT,
+  score INT NOT NULL DEFAULT 10,
+  trainer_id VARCHAR(20) NOT NULL,
+  student_id VARCHAR(20) NOT NULL,
+  status ENUM('active','completed','terminated') NOT NULL DEFAULT 'active',
+  close_note TEXT NULL,
+  viewed_at DATETIME NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  closed_at DATETIME NULL,
+  INDEX idx_trainer(trainer_id),
+  INDEX idx_student(student_id)
+) ENGINE=InnoDB;
+
+CREATE TABLE task_attachments (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  task_id INT NOT NULL,
+  att_type ENUM('file','link') NOT NULL DEFAULT 'file',
+  original_name VARCHAR(500) NULL,
+  stored_name VARCHAR(500) NULL,
+  link_url VARCHAR(1000) NULL,
+  mime_type VARCHAR(100) NULL,
+  file_size INT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE task_threads (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  task_id INT NOT NULL,
+  author_id VARCHAR(20) NOT NULL,
+  entry_type ENUM('submission','comment') NOT NULL,
+  content TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_task(task_id)
+) ENGINE=InnoDB;
+
+CREATE TABLE task_thread_attachments (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  thread_id INT NOT NULL,
+  att_type ENUM('file','link') NOT NULL DEFAULT 'file',
+  original_name VARCHAR(500) NULL,
+  stored_name VARCHAR(500) NULL,
+  link_url VARCHAR(1000) NULL,
+  mime_type VARCHAR(100) NULL,
+  file_size INT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (thread_id) REFERENCES task_threads(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
 
 -- Initial admin account (no demo student/teacher accounts)
 INSERT INTO users (id, name, role, password, grade, dept, workplace_id) VALUES

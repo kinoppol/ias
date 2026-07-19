@@ -8,6 +8,7 @@ $navByRole = [
     'student' => [
         ['key' => 'dashboard', 'icon' => '🏠', 'label' => 'เช็คอิน/ออก', 'href' => '/ias/student/dashboard.php'],
         ['key' => 'history',   'icon' => '📋', 'label' => 'ประวัติ',     'href' => '/ias/student/history.php'],
+        ['key' => 'tasks',     'icon' => '📌', 'label' => 'งาน',         'href' => '/ias/student/tasks.php'],
         ['key' => 'leave',     'icon' => '📝', 'label' => 'การลา',      'href' => '/ias/student/leave.php'],
     ],
     'teacher' => [
@@ -15,7 +16,13 @@ $navByRole = [
         ['key' => 'students',  'icon' => '👥', 'label' => 'นักศึกษา',    'href' => '/ias/teacher/students.php'],
         ['key' => 'schedule',  'icon' => '⏰', 'label' => 'ตารางเวลา',  'href' => '/ias/teacher/schedule.php'],
         ['key' => 'reports',   'icon' => '📈', 'label' => 'รายงาน',     'href' => '/ias/teacher/reports.php'],
-        ['key' => 'leaves',    'icon' => '🗓', 'label' => 'การลา',      'href' => '/ias/teacher/leaves.php'],
+        ['key' => 'leaves',      'icon' => '🗓', 'label' => 'การลา',       'href' => '/ias/teacher/leaves.php'],
+        ['key' => 'task_report', 'icon' => '📌', 'label' => 'ติดตามงาน',  'href' => '/ias/teacher/task_report.php'],
+    ],
+    'trainer' => [
+        ['key' => 'dashboard', 'icon' => '📊', 'label' => 'ภาพรวม',         'href' => '/ias/trainer/dashboard.php'],
+        ['key' => 'tasks',     'icon' => '📋', 'label' => 'งานที่มอบหมาย',   'href' => '/ias/trainer/tasks.php'],
+        ['key' => 'students',  'icon' => '👥', 'label' => 'นักศึกษา',        'href' => '/ias/trainer/students.php'],
     ],
     'admin' => [
         ['key' => 'users',      'icon' => '👤',  'label' => 'ผู้ใช้งาน',      'href' => '/ias/admin/users.php'],

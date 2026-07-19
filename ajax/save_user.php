@@ -11,12 +11,16 @@ $grade = trim($_POST['grade'] ?? '') ?: null;
 $dept = trim($_POST['dept'] ?? '') ?: null;
 $workplaceId = trim($_POST['workplace_id'] ?? '') ?: null;
 
-if (!in_array($role, ['student', 'teacher', 'admin'], true)) {
+if (!in_array($role, ['student', 'teacher', 'admin', 'trainer'], true)) {
     $_SESSION['notif'] = ['msg' => 'บทบาทไม่ถูกต้อง', 'type' => 'error'];
     header('Location: /ias/admin/users.php');
     exit;
 }
-if ($role !== 'student') {
+if ($role === 'trainer') {
+    $grade = null;
+    $dept = null;
+    $workplaceId = trim($_POST['trainer_workplace_id'] ?? '') ?: null;
+} elseif ($role !== 'student') {
     $grade = null;
     $workplaceId = null;
 }

@@ -4,8 +4,9 @@ require_role('admin');
 
 $rmap = [
     'student' => ['label' => 'นักศึกษาฝึกงาน', 'color' => '#1E40AF', 'bg' => '#DBEAFE'],
-    'teacher' => ['label' => 'ครูนิเทศ', 'color' => '#166534', 'bg' => '#DCFCE7'],
-    'admin'   => ['label' => 'ผู้ดูแลระบบ', 'color' => '#92400E', 'bg' => '#FEF3C7'],
+    'teacher' => ['label' => 'ครูนิเทศ',        'color' => '#166534', 'bg' => '#DCFCE7'],
+    'trainer' => ['label' => 'ครูฝึก',           'color' => '#6D28D9', 'bg' => '#EDE9FE'],
+    'admin'   => ['label' => 'ผู้ดูแลระบบ',      'color' => '#92400E', 'bg' => '#FEF3C7'],
 ];
 
 $stmt = $pdo->query('SELECT u.*, w.name AS wp_name FROM users u LEFT JOIN workplaces w ON w.id = u.workplace_id ORDER BY u.role, u.id');
@@ -40,15 +41,29 @@ function user_form_fields($u, $workplaces, $isEdit) {
       </div>
       <div>
         <label>บทบาท</label>
-        <select name="role" onchange="document.getElementById('studentFields').style.display = this.value==='student' ? '' : 'none';" id="roleSelect">
+        <select name="role" onchange="var v=this.value; document.getElementById('studentFields').style.display=v==='student'?'':'none'; document.getElementById('trainerFields').style.display=v==='trainer'?'':'none';" id="roleSelect">
           <option value="student" <?= $role === 'student' ? 'selected' : '' ?>>นักศึกษาฝึกงาน</option>
           <option value="teacher" <?= $role === 'teacher' ? 'selected' : '' ?>>ครูนิเทศ</option>
+          <option value="trainer" <?= $role === 'trainer' ? 'selected' : '' ?>>ครูฝึก (Workplace Trainer)</option>
           <option value="admin" <?= $role === 'admin' ? 'selected' : '' ?>>ผู้ดูแลระบบ</option>
         </select>
       </div>
       <div>
         <label>รหัสผ่าน<?= $isEdit ? ' (เว้นว่างถ้าไม่เปลี่ยน)' : '' ?></label>
         <input type="password" name="password" placeholder="<?= $isEdit ? '••••••••' : 'กำหนดรหัสผ่าน' ?>">
+      </div>
+    </div>
+    <div id="trainerFields" style="<?= $role === 'trainer' ? '' : 'display:none;' ?>">
+      <div class="wp-form-grid">
+        <div>
+          <label>สถานประกอบการที่รับผิดชอบ</label>
+          <select name="trainer_workplace_id">
+            <option value="">— ไม่ระบุ —</option>
+            <?php foreach ($workplaces as $wp): ?>
+              <option value="<?= htmlspecialchars($wp['id']) ?>" <?= ($u['workplace_id'] ?? '') === $wp['id'] ? 'selected' : '' ?>><?= htmlspecialchars($wp['name']) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
       </div>
     </div>
     <div id="studentFields" style="<?= $role === 'student' ? '' : 'display:none;' ?>">
