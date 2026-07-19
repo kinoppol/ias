@@ -1,7 +1,7 @@
 <?php
 // Auto-migration — versioned so new migrations always run even on existing sessions
 // Bump MIGRATE_VERSION whenever new migrations are added
-define('MIGRATE_VERSION', 3);
+define('MIGRATE_VERSION', 4);
 
 if (!empty($_SESSION['_migrated_v']) && (int)$_SESSION['_migrated_v'] >= MIGRATE_VERSION) return;
 
@@ -113,6 +113,15 @@ function run_migrations($pdo) {
         $results[] = ['name' => 'table: task_thread_attachments', 'status' => 'applied'];
     } else {
         $results[] = ['name' => 'table: task_thread_attachments', 'status' => 'ok'];
+    }
+
+    // M8: tasks.due_date
+    $dc = $pdo->query("SHOW COLUMNS FROM tasks LIKE 'due_date'")->fetchAll();
+    if (!$dc && $pdo->query("SHOW TABLES LIKE 'tasks'")->fetch()) {
+        $pdo->exec("ALTER TABLE tasks ADD COLUMN due_date DATETIME NULL AFTER score");
+        $results[] = ['name' => 'tasks.due_date', 'status' => 'applied'];
+    } else {
+        $results[] = ['name' => 'tasks.due_date', 'status' => 'ok'];
     }
 
     return $results;

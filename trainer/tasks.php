@@ -74,6 +74,10 @@ require_once __DIR__ . '/../includes/header.php';
         <label>คะแนนเต็ม</label>
         <input type="number" name="score" value="10" min="1" max="100">
       </div>
+      <div>
+        <label>📅 กำหนดส่ง / วันสิ้นสุด</label>
+        <input type="datetime-local" name="due_date">
+      </div>
     </div>
     <div style="margin-bottom:12px;">
       <label>รายละเอียดงาน / คำอธิบาย</label>
@@ -116,7 +120,12 @@ function addLink() {
         <a href="/ias/trainer/task_detail.php?id=<?= $t['id'] ?>" style="color:#1A237E;"><?= htmlspecialchars($t['title']) ?></a>
         <?php if ($subs > 0): ?><span style="background:#FEF3C7;color:#D97706;border-radius:20px;padding:2px 10px;font-size:12px;margin-left:6px;">📬 <?= $subs ?> ส่งงาน</span><?php endif; ?>
       </div>
-      <div class="task-card-meta">👤 <?= htmlspecialchars($t['student_name']) ?> · 📅 <?= substr($t['created_at'],0,10) ?> · 🎯 <?= (int)$t['score'] ?> คะแนน · <?= $t['viewed_at'] ? '👁 เปิดดูแล้ว' : '⏳ ยังไม่เปิด' ?></div>
+      <div class="task-card-meta">
+        👤 <?= htmlspecialchars($t['student_name']) ?> · 📅 <?= substr($t['created_at'],0,10) ?> · 🎯 <?= (int)$t['score'] ?> คะแนน · <?= $t['viewed_at'] ? '👁 เปิดดูแล้ว' : '⏳ ยังไม่เปิด' ?>
+        <?php if ($t['due_date']): $overdue = $t['status']==='active' && $t['due_date'] < date('Y-m-d H:i:s'); ?>
+        · <span style="color:<?= $overdue ? '#DC2626' : '#D97706' ?>;font-weight:600;"><?= $overdue ? '⚠️ เกินกำหนด' : '⏰' ?> กำหนดส่ง: <?= substr($t['due_date'],0,16) ?></span>
+        <?php endif; ?>
+      </div>
     </div>
     <div style="display:flex;align-items:center;gap:8px;">
       <span class="badge" style="color:<?= $si['color'] ?>;background:<?= $si['bg'] ?>;"><?= $si['icon'] ?> <?= $si['label'] ?></span>

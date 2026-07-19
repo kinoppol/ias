@@ -7,6 +7,9 @@ $title = trim($_POST['title'] ?? '');
 $studentId = trim($_POST['student_id'] ?? '');
 $score = max(1, min(100, (int)($_POST['score'] ?? 10)));
 $description = trim($_POST['description'] ?? '') ?: null;
+$dueDate = trim($_POST['due_date'] ?? '') ?: null;
+// Convert datetime-local (YYYY-MM-DDTHH:MM) to MySQL format
+if ($dueDate) $dueDate = str_replace('T', ' ', $dueDate) . ':00';
 
 if (!$title || !$studentId) {
     $_SESSION['notif'] = ['msg' => 'กรุณากรอกชื่องานและเลือกนักศึกษา', 'type' => 'error'];
@@ -23,8 +26,8 @@ if (!$stmt->fetch()) {
     exit;
 }
 
-$stmt = $pdo->prepare("INSERT INTO tasks (title, description, score, trainer_id, student_id) VALUES (?, ?, ?, ?, ?)");
-$stmt->execute([$title, $description, $score, $user['id'], $studentId]);
+$stmt = $pdo->prepare("INSERT INTO tasks (title, description, score, due_date, trainer_id, student_id) VALUES (?, ?, ?, ?, ?, ?)");
+$stmt->execute([$title, $description, $score, $dueDate, $user['id'], $studentId]);
 $taskId = (int)$pdo->lastInsertId();
 
 // Handle attachments

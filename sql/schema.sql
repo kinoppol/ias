@@ -84,6 +84,7 @@ CREATE TABLE tasks (
   title VARCHAR(500) NOT NULL,
   description TEXT,
   score INT NOT NULL DEFAULT 10,
+  due_date DATETIME NULL,
   trainer_id VARCHAR(20) NOT NULL,
   student_id VARCHAR(20) NOT NULL,
   status ENUM('active','completed','terminated') NOT NULL DEFAULT 'active',

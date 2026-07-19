@@ -58,7 +58,12 @@ require_once __DIR__ . '/../includes/header.php';
   <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;">
     <div>
       <div style="font-size:18px;font-weight:800;color:#1A237E;margin-bottom:4px;"><?= htmlspecialchars($task['title']) ?></div>
-      <div style="font-size:13px;color:#64748B;">👤 <?= htmlspecialchars($task['student_name']) ?><?= $task['student_dept'] ? ' · ' . htmlspecialchars($task['student_dept']) : '' ?> · 🎯 <?= (int)$task['score'] ?> คะแนน · 📅 <?= substr($task['created_at'],0,10) ?></div>
+      <div style="font-size:13px;color:#64748B;">
+        👤 <?= htmlspecialchars($task['student_name']) ?><?= $task['student_dept'] ? ' · ' . htmlspecialchars($task['student_dept']) : '' ?> · 🎯 <?= (int)$task['score'] ?> คะแนน · 📅 มอบหมาย: <?= substr($task['created_at'],0,10) ?>
+        <?php if ($task['due_date']): $overdue = $task['status']==='active' && $task['due_date'] < date('Y-m-d H:i:s'); ?>
+        · <span style="font-weight:700;color:<?= $overdue ? '#DC2626' : '#D97706' ?>;"><?= $overdue ? '⚠️ เกินกำหนด!' : '⏰' ?> กำหนดส่ง: <?= substr($task['due_date'],0,16) ?></span>
+        <?php endif; ?>
+      </div>
     </div>
     <span class="badge" style="color:<?= $si['color'] ?>;background:<?= $si['bg'] ?>;font-size:13px;padding:6px 14px;"><?= $si['icon'] ?> <?= $si['label'] ?></span>
   </div>

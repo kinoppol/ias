@@ -31,7 +31,12 @@ require_once __DIR__ . '/../includes/header.php';
       <?php if ($isNew): ?><span class="stask-new-dot"></span><?php endif; ?>
       <?= htmlspecialchars($t['title']) ?>
     </div>
-    <div style="font-size:12px;color:#94A3B8;margin-top:4px;">🧑‍💼 <?= htmlspecialchars($t['trainer_name']) ?> · 🎯 <?= (int)$t['score'] ?> คะแนน · 📅 <?= substr($t['created_at'],0,10) ?></div>
+    <div style="font-size:12px;color:#94A3B8;margin-top:4px;">
+      🧑‍💼 <?= htmlspecialchars($t['trainer_name']) ?> · 🎯 <?= (int)$t['score'] ?> คะแนน · 📅 <?= substr($t['created_at'],0,10) ?>
+      <?php if ($t['due_date']): $overdue = $t['status']==='active' && $t['due_date'] < date('Y-m-d H:i:s'); ?>
+      · <span style="color:<?= $overdue ? '#DC2626' : '#D97706' ?>;font-weight:600;"><?= $overdue ? '⚠️ เกินกำหนด' : '⏰ กำหนดส่ง' ?>: <?= substr($t['due_date'],0,16) ?></span>
+      <?php endif; ?>
+    </div>
   </div>
   <div style="display:flex;align-items:center;gap:8px;">
     <span class="badge" style="color:<?= $si['color'] ?>;background:<?= $si['bg'] ?>;"><?= $si['icon'] ?> <?= $si['label'] ?></span>
