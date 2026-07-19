@@ -29,6 +29,7 @@ $navByRole = [
         ['key' => 'workplaces', 'icon' => '🏢',  'label' => 'สถานประกอบการ', 'href' => '/ias/admin/workplaces.php'],
         ['key' => 'holidays',   'icon' => '🗓',  'label' => 'วันหยุด',        'href' => '/ias/admin/holidays.php'],
         ['key' => 'settings',   'icon' => '⚙️',  'label' => 'ตั้งค่า',        'href' => '/ias/admin/settings.php'],
+        ['key' => 'migrate',    'icon' => '🔧',  'label' => 'Migration',      'href' => '/ias/admin/migrate.php'],
     ],
 ];
 $navItems = $navByRole[$role] ?? [];
