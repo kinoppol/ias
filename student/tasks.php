@@ -10,6 +10,7 @@ $tasks = $stmt->fetchAll();
 // Count unread (active, not yet viewed)
 $unread = 0;
 foreach ($tasks as $t) { if ($t['status'] === 'active' && !$t['viewed_at']) $unread++; }
+$_navUnreadTasks = $unread; // pass to header nav badge
 
 $activeSection = 'tasks';
 $pageTitle = 'งานที่ได้รับมอบหมาย';

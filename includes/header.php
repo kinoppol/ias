@@ -33,6 +33,18 @@ $navByRole = [
     ],
 ];
 $navItems = $navByRole[$role] ?? [];
+
+// Count unread tasks for student nav badge (may already be set by page)
+if (!isset($_navUnreadTasks)) {
+    $_navUnreadTasks = 0;
+    if ($role === 'student') {
+        try {
+            $s = $pdo->prepare("SELECT COUNT(*) FROM tasks WHERE student_id = ? AND status = 'active' AND viewed_at IS NULL");
+            $s->execute([$user['id']]);
+            $_navUnreadTasks = (int)$s->fetchColumn();
+        } catch (Exception $e) {}
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="th">
@@ -74,9 +86,14 @@ $navItems = $navByRole[$role] ?? [];
   <div class="app-body">
     <nav class="app-sidebar desktop-only no-print">
       <?php foreach ($navItems as $item): ?>
-        <a href="<?= $item['href'] ?>" class="nav-btn <?= $activeSection === $item['key'] ? 'active' : '' ?>">
-          <span class="nav-icon"><?= $item['icon'] ?></span>
-          <span><?= htmlspecialchars($item['label']) ?></span>
+        <a href="<?= $item['href'] ?>" class="nav-btn <?= $activeSection === $item['key'] ? 'active' : '' ?>" style="justify-content:space-between;">
+          <span style="display:flex;align-items:center;gap:9px;">
+            <span class="nav-icon"><?= $item['icon'] ?></span>
+            <span><?= htmlspecialchars($item['label']) ?></span>
+          </span>
+          <?php if ($item['key'] === 'tasks' && $_navUnreadTasks > 0): ?>
+            <span style="background:#DC2626;color:#fff;border-radius:20px;padding:1px 8px;font-size:11px;font-weight:700;line-height:1.7;min-width:18px;text-align:center;"><?= $_navUnreadTasks ?></span>
+          <?php endif; ?>
         </a>
       <?php endforeach; ?>
       <div class="sidebar-clock">
