@@ -28,6 +28,8 @@ function wp_form_fields($wp, $teachers) {
     $endTime = substr($wp['end_time'] ?? '17:00:00', 0, 5);
     $teacherId = $wp['teacher_id'] ?? '';
     $allowOt = !empty($wp['allow_ot']);
+    $workDays = $wp['work_days'] ?? '1111100';
+    $dayNames = ['จ.','อ.','พ.','พฤ.','ศ.','ส.','อา.'];
     ?>
     <div class="wp-form-grid">
       <div>
@@ -66,6 +68,17 @@ function wp_form_fields($wp, $teachers) {
             <option value="<?= htmlspecialchars($t['id']) ?>" <?= $teacherId === $t['id'] ? 'selected' : '' ?>><?= htmlspecialchars($t['name']) ?></option>
           <?php endforeach; ?>
         </select>
+      </div>
+    </div>
+    <div style="margin-bottom:14px;">
+      <label style="font-size:13px;font-weight:600;color:#374151;display:block;margin-bottom:8px;">📅 วันทำงาน</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <?php foreach ($dayNames as $i => $d): ?>
+          <label style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;">
+            <input type="checkbox" name="work_days[]" value="<?= $i ?>" <?= ($workDays[$i] ?? '0') === '1' ? 'checked' : '' ?> style="width:18px;height:18px;">
+            <span style="font-size:13px;font-weight:600;color:<?= $i >= 5 ? '#DC2626' : '#1E293B' ?>;"><?= $d ?></span>
+          </label>
+        <?php endforeach; ?>
       </div>
     </div>
     <label style="display:flex;align-items:center;gap:8px;font-size:13.5px;color:#374151;margin-bottom:14px;">

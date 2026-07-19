@@ -20,6 +20,7 @@ $navByRole = [
     'admin' => [
         ['key' => 'users',      'icon' => '👤',  'label' => 'ผู้ใช้งาน',      'href' => '/ias/admin/users.php'],
         ['key' => 'workplaces', 'icon' => '🏢',  'label' => 'สถานประกอบการ', 'href' => '/ias/admin/workplaces.php'],
+        ['key' => 'holidays',   'icon' => '🗓',  'label' => 'วันหยุด',        'href' => '/ias/admin/holidays.php'],
         ['key' => 'settings',   'icon' => '⚙️',  'label' => 'ตั้งค่า',        'href' => '/ias/admin/settings.php'],
     ],
 ];
