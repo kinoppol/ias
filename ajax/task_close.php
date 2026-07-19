@@ -17,8 +17,8 @@ if ($action === 'terminated' && !$closeNote) {
     exit;
 }
 
-$stmt = $pdo->prepare("UPDATE tasks SET status = ?, close_note = ?, closed_at = NOW() WHERE id = ? AND trainer_id = ? AND status = 'active'");
-$stmt->execute([$action, $closeNote, $taskId, $user['id']]);
+$stmt = $pdo->prepare("UPDATE tasks SET status = ?, close_note = ?, closed_at = ? WHERE id = ? AND trainer_id = ? AND status = 'active'");
+$stmt->execute([$action, $closeNote, date('Y-m-d H:i:s'), $taskId, $user['id']]);
 
 $msg = $action === 'completed' ? '✅ ทำเครื่องหมายงานเสร็จสิ้นแล้ว' : '🔴 สิ้นสุดงานแล้ว';
 $_SESSION['notif'] = ['msg' => $msg, 'type' => 'success'];

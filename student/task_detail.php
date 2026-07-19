@@ -11,8 +11,9 @@ if (!$task) { header('Location: /ias/student/tasks.php'); exit; }
 
 // Mark as viewed
 if (!$task['viewed_at']) {
-    $pdo->prepare("UPDATE tasks SET viewed_at = NOW() WHERE id = ?")->execute([$taskId]);
-    $task['viewed_at'] = date('Y-m-d H:i:s');
+    $now = date('Y-m-d H:i:s');
+    $pdo->prepare("UPDATE tasks SET viewed_at = ? WHERE id = ?")->execute([$now, $taskId]);
+    $task['viewed_at'] = $now;
 }
 
 // Task attachments
