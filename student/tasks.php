@@ -38,9 +38,14 @@ require_once __DIR__ . '/../includes/header.php';
       <?php endif; ?>
     </div>
   </div>
-  <div style="display:flex;align-items:center;gap:8px;">
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
     <span class="badge" style="color:<?= $si['color'] ?>;background:<?= $si['bg'] ?>;"><?= $si['icon'] ?> <?= $si['label'] ?></span>
-    <a href="/ias/student/task_detail.php?id=<?= $t['id'] ?>" class="btn-primary" style="font-size:13px;padding:7px 14px;"><?= $isNew ? '📖 เปิดดูงาน' : 'ดูรายละเอียด' ?></a>
+    <?php if ($t['viewed_at']): ?>
+      <span class="badge" style="color:#16A34A;background:#DCFCE7;">👁 เปิดดูแล้ว</span>
+    <?php else: ?>
+      <span class="badge" style="color:#DC2626;background:#FEE2E2;">🔴 ยังไม่ได้เปิดดู</span>
+    <?php endif; ?>
+    <a href="/ias/student/task_detail.php?id=<?= $t['id'] ?>" class="btn-primary" style="font-size:13px;padding:7px 14px;<?= $isNew ? 'background:#DC2626;' : '' ?>"><?= $isNew ? '📖 เปิดดูงาน' : 'ดูรายละเอียด' ?></a>
   </div>
 </div>
 <?php endforeach; ?>
