@@ -9,6 +9,17 @@ function week_start($dateStr) {
     return $d->format('Y-m-d');
 }
 
+function count_weekdays($start, $end) {
+    $d = new DateTime($start);
+    $e = new DateTime($end);
+    $count = 0;
+    while ($d <= $e) {
+        if ((int)$d->format('N') <= 5) $count++;
+        $d->modify('+1 day');
+    }
+    return $count;
+}
+
 $period = $_GET['period'] ?? 'daily';
 if (!in_array($period, ['daily', 'weekly', 'monthly'], true)) $period = 'daily';
 
@@ -43,6 +54,7 @@ if ($period === 'daily') {
     $c1 = 'เข้างาน'; $c2 = 'ออกงาน'; $c3 = 'สถานะ'; $c4 = 'หมายเหตุ';
 } else {
     $hasC5 = true;
+    $today = date('Y-m-d');
     if ($period === 'weekly') {
         $start = $rptWeek;
         $end = (new DateTime($rptWeek))->modify('+4 days')->format('Y-m-d');
@@ -52,6 +64,10 @@ if ($period === 'daily') {
         $end = (new DateTime($start))->modify('last day of this month')->format('Y-m-d');
         $title = "รายงานเดือน $rptMonth";
     }
+    // Count weekdays (Mon–Fri) up to today for absent calculation
+    $effectiveEnd = $end < $today ? $end : $today;
+    $workingDays = $start <= $effectiveEnd ? count_weekdays($start, $effectiveEnd) : 0;
+
     $stmt = $pdo->prepare('SELECT student_id, status, COUNT(*) c FROM attendance WHERE date BETWEEN ? AND ? GROUP BY student_id, status');
     $stmt->execute([$start, $end]);
     $byStudent = [];
@@ -67,13 +83,16 @@ if ($period === 'daily') {
         $present = $c['present'] ?? 0;
         $late = $c['late'] ?? 0;
         $half = $c['half-day'] ?? 0;
-        $total = $present + $late + $half;
+        $attended = $present + $late + $half;
+        $absent = max(0, $workingDays - $attended);
+        $total = $attended; // for percentage
         $pct = $total ? round(($present + $late) / $total * 100) : 0;
         $pc = $pct >= 90 ? '#16A34A' : ($pct >= 75 ? '#D97706' : '#DC2626');
         $noCheckout = $noCheckoutByStudent[$s['id']] ?? 0;
         $rows[] = [
             'id' => $s['id'], 'name' => $s['name'], 'dept' => $s['dept'] ?: '-',
-            'v1' => (string)$present, 'v2' => (string)$late, 'v3' => (string)$half, 'v4' => $pct . '%',
+            'v1' => (string)$present, 'v2' => (string)$late, 'v3' => (string)$absent, 'v4' => $pct . '%',
+            'v3Color' => $absent > 0 ? '#DC2626' : '#94A3B8',
             'v5' => (string)$noCheckout, 'v5Color' => $noCheckout > 0 ? '#DC2626' : '#94A3B8',
             'sc' => '#64748B', 'sb' => '#F1F5F9', 'pc' => $pc,
         ];
@@ -125,7 +144,7 @@ require_once __DIR__ . '/../includes/header.php';
           <td class="center" style="font-weight:600;color:#0D47A1;"><?= htmlspecialchars($r['v1']) ?></td>
           <td class="center" style="color:#374151;"><?= htmlspecialchars($r['v2']) ?></td>
           <?php if ($hasC5): ?>
-          <td class="center"><span class="badge" style="color:<?= $r['sc'] ?>;background:<?= $r['sb'] ?>;"><?= htmlspecialchars($r['v3']) ?></span></td>
+          <td class="center" style="font-weight:600;color:<?= $r['v3Color'] ?? '#94A3B8' ?>;"><?= htmlspecialchars($r['v3']) ?></td>
           <td class="center" style="font-weight:600;color:<?= $r['pc'] ?>;"><?= htmlspecialchars($r['v4']) ?></td>
           <td class="center" style="font-weight:600;color:<?= $r['v5Color'] ?>;"><?= htmlspecialchars($r['v5']) ?></td>
           <?php else: ?>
