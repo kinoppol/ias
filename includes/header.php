@@ -36,6 +36,14 @@ $navItems = $navByRole[$role] ?? [];
 </head>
 <body>
 <div class="app-shell">
+<?php if (isset($_SESSION['original_admin'])): ?>
+<div class="impersonate-bar no-print">
+  <span>🎭 กำลังสวมสิทธิ์เป็น <strong><?= htmlspecialchars($user['name']) ?></strong> (<?= htmlspecialchars(role_label($role)) ?>) — Admin: <?= htmlspecialchars($_SESSION['original_admin']['name']) ?></span>
+  <form method="post" action="/ias/ajax/stop_impersonate.php" style="display:inline;margin:0;">
+    <button type="submit" class="impersonate-exit-btn">⬅ คืนสิทธิ์ Admin</button>
+  </form>
+</div>
+<?php endif; ?>
   <header class="app-header no-print">
     <div class="app-header-left">
       <?= ovec_logo(32, 13) ?>

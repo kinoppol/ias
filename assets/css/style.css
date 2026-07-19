@@ -192,3 +192,9 @@ table.data-table td.center { text-align:center; }
 .toast-error { background:#FEF2F2; color:#991B1B; border-color:#991B1B; }
 .toast-warning { background:#FEF9EC; color:#92400E; border-color:#92400E; }
 .toast-info { background:#EFF6FF; color:#1E40AF; border-color:#1E40AF; }
+
+
+/* ===== Impersonation bar ===== */
+.impersonate-bar { background:#7C3AED; color:#fff; font-size:13px; padding:8px 18px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.impersonate-exit-btn { background:#fff; color:#7C3AED; border:none; border-radius:8px; padding:5px 14px; font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap; font-family:inherit; }
+.impersonate-exit-btn:hover { background:#EDE9FE; }

@@ -121,8 +121,14 @@ require_once __DIR__ . '/../includes/header.php';
           <td style="color:#1E293B;"><?= htmlspecialchars($u['name']) ?></td>
           <td><span class="badge" style="color:<?= $ri['color'] ?>;background:<?= $ri['bg'] ?>;"><?= htmlspecialchars($ri['label']) ?></span></td>
           <td style="color:#64748B;"><?= htmlspecialchars(short_wp_name($u['wp_name'])) ?></td>
-          <td class="center">
-            <a href="?edit=<?= htmlspecialchars($u['id']) ?>" class="btn-toggle" style="margin-right:6px;">แก้ไข</a>
+          <td class="center" style="white-space:nowrap;">
+            <?php if ($u['id'] !== current_user()['id']): ?>
+            <form method="post" action="/ias/ajax/impersonate.php" style="display:inline;margin-right:4px;">
+              <input type="hidden" name="user_id" value="<?= htmlspecialchars($u['id']) ?>">
+              <button type="submit" class="btn-toggle" style="background:#EDE9FE;color:#6D28D9;">🎭 สวมสิทธิ์</button>
+            </form>
+            <?php endif; ?>
+            <a href="?edit=<?= htmlspecialchars($u['id']) ?>" class="btn-toggle" style="margin-right:4px;">แก้ไข</a>
             <form method="post" action="/ias/ajax/delete_user.php" onsubmit="return confirm('ยืนยันการลบผู้ใช้?');" style="display:inline;">
               <input type="hidden" name="id" value="<?= htmlspecialchars($u['id']) ?>">
               <button type="submit" class="btn-delete-sm">ลบ</button>
